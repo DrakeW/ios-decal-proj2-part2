@@ -115,25 +115,30 @@ func store(data: Data, toPath path: String) {
 func getPosts(user: CurrentUser, completion: @escaping ([Post]?) -> Void) {
     let dbRef = FIRDatabase.database().reference()
     var postArray: [Post] = []
-    
+    print("Getting posts")
     // YOUR CODE HERE
     dbRef.child(firPostsNode).observeSingleEvent(of: .value, with: { (snapshot) in
+        print("Hello, ", snapshot.exists())
         if snapshot.exists() {
             if let dict = snapshot.value as? [String: AnyObject] {
+                print("World, ", dict)
                 user.getReadPostIDs(completion: { (readPostIds) in
-                    for (postId, _) in dict {
+                    print("Read posts ids: ", readPostIds)
+                    for (postId, val) in dict {
                         let post = Post(id: postId,
-                                        username: dict["username"] as! String,
-                                        postImagePath: dict["imagePath"] as! String,
-                                        thread: dict["thread"] as! String,
-                                        dateString: dict["date"] as! String,
+                                        username: val["username"] as! String,
+                                        postImagePath: val["imagePath"] as! String,
+                                        thread: val["thread"] as! String,
+                                        dateString: val["date"] as! String,
                                         read: readPostIds.contains(postId))
                         postArray.append(post)
                     }
+                    print("Posts: ", postArray)
                     completion(postArray)
                 })
             }
         } else {
+            print("Snapshot doesn't exist")
             completion(nil)
         }
     })

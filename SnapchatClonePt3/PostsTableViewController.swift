@@ -74,15 +74,19 @@ class PostsTableViewController: UIViewController, UITableViewDelegate, UITableVi
     func updateData() {
         // YOUR CODE HERE
         getPosts(user: currentUser) { (posts) in
-            clearThreads()
-            for post in posts! {
-                addPostToThread(post: post)
-                getDataFromPath(path: post.postImagePath, completion: { (data) in
-                    let image = UIImage(data: data!)
-                    self.loadedImagesById[post.postId] = image
-                })
+            if let posts = posts {
+                clearThreads()
+                for post in posts {
+                    addPostToThread(post: post)
+                    getDataFromPath(path: post.postImagePath, completion: { (data) in
+                        if let data = data {
+                            let image = UIImage(data: data)
+                            self.loadedImagesById[post.postId] = image
+                        }
+                    })
+                }
+                self.postTableView.reloadData()
             }
-            self.postTableView.reloadData()
         }
     }
     
